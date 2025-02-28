@@ -6,3 +6,4 @@ openai
 pydantic
 pysqlite3-binary
 setuptools
+pymupdf
