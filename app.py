@@ -8,11 +8,8 @@ from crewai_tools import PDFSearchTool, DOCXSearchTool, DirectoryReadTool
 
 import openai
 from openai import OpenAI
-from dotenv import load_dotenv
 
-load_dotenv()
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = st.secrets["OPENAI_API_KEY"] #os.getenv("OPENAI_API_KEY")
 os.environ["OPENAI_MODEL_NAME"] = "o3-mini"
 
 # 기본 폴더 경로
