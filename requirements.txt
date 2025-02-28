@@ -1,5 +1,6 @@
 crewai
 chromadb
+sqlite3
 streamlit
 openai
 pydantic
