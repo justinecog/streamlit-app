@@ -1,6 +1,6 @@
 crewai
 chromadb
-pysqlite3-binary
 streamlit
 openai
 pydantic
+pysqlite3-binary
