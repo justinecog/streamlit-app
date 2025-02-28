@@ -1,2 +1,5 @@
 crewai
+chromadb
+streamlit
 openai
+pydantic
