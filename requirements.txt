@@ -4,3 +4,4 @@ chromadb==0.4.17
 openai
 pydantic
 pysqlite3-binary
+setuptools
