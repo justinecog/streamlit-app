@@ -4,3 +4,4 @@ pysqlite3-binary
 streamlit
 openai
 pydantic
+sqlite3==3.35.0
