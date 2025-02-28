@@ -1,6 +1,6 @@
 crewai
-chromadb
-streamlit
+streamlit==1.28.1
+chromadb==0.4.17
 openai
 pydantic
 pysqlite3-binary
