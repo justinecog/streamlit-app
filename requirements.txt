@@ -1,6 +1,6 @@
 streamlit==1.28.1
 chromadb==0.4.17
-crewai==0.102.0
+crewai==0.101.0
 crewai[tools]
 openai
 pydantic
