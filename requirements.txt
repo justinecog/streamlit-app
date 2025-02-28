@@ -1,5 +1,5 @@
 streamlit==1.28.1
-chromadb==0.4.22
+chromadb==0.5.23
 crewai==0.102.0
 crewai[tools]
 openai
