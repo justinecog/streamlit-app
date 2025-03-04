@@ -1,3 +1,7 @@
+import sys
+import pysqlite3
+sys.modules["sqlite3"] = pysqlite3
+
 import streamlit as st
 import os
 import shutil
@@ -5,10 +9,6 @@ import pandas as pd
 from datetime import datetime
 from crewai import Agent, Task, Crew, Process
 from crewai_tools import PDFSearchTool, DOCXSearchTool, DirectoryReadTool
-
-import sys
-import pysqlite3
-sys.modules["sqlite3"] = pysqlite3
 
 import openai
 from openai import OpenAI
