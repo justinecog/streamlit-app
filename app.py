@@ -8,12 +8,11 @@ import shutil
 import pandas as pd
 from datetime import datetime
 from crewai import Agent, Task, Crew, Process
-from crewai_tools import PDFSearchTool, DOCXSearchTool, DirectoryReadTool
+from crewai_tools import PDFSearchTool, DOCXSearchTool, TXTSearchTool, DirectoryReadTool
 
 import openai
-from openai import OpenAI
 
-openai.api_key = st.secrets["OPENAI_API_KEY"] #os.getenv("OPENAI_API_KEY")
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 os.environ["OPENAI_MODEL_NAME"] = "o3-mini"
 
 # 기본 폴더 경로
@@ -29,11 +28,16 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, st.session_state.foldername)
 # 폴더 생성 (최초 1회만 실행됨)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# 📂 파일 저장 함수
 def save_uploaded_file(directory, file):
     file_path = os.path.join(directory, file.name)
-    with open(file_path, "wb") as f:
-        f.write(file.getbuffer())
+    
+    if file.name.endswith(".txt"):
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(file.getvalue().decode("utf-8"))
+    else:
+        with open(file_path, "wb") as f:
+            f.write(file.getbuffer())
+
     return st.success(f"파일 업로드 성공! ({file.name})")
 
 # 📂 폴더 삭제 함수
@@ -116,6 +120,7 @@ def main():
         # CrewAI 설정
         pdf_search_tool = PDFSearchTool()
         docx_search_tool = DOCXSearchTool()
+        txt_search_tool = TXTSearchTool()
         directory_read_tool = DirectoryReadTool(directory=UPLOAD_FOLDER)
 
         researcher = Agent(
@@ -129,11 +134,11 @@ def main():
             tools = [
                 directory_read_tool,
                 pdf_search_tool,
-                docx_search_tool
+                docx_search_tool,
+                txt_search_tool
             ],
         )
-        
-        
+    
         editor = Agent(
             role="전문적인 에디터",
             goal="회의록을 명확하고 체계적으로 정리하여 최종 문서로 완성",
@@ -150,7 +155,7 @@ def main():
         research_task = Task(
             agent=researcher,
             description="""'{topic}'에 대한 정보를 수집하고 분석하세요. 당신은 철저한 연구를 수행하는 AI입니다.
-            주어진 pdf 파일은 회의자료, docx 파일은 회의 스크립트입니다. pdf 파일 모두와 docx 파일 모두를 분석해주세요.
+            주어지는 파일 (pdf, docx, txt) 모두를 분석해주세요.
         당신의 응답은 검증된 출처, 데이터 또는 공식 문서를 기반으로 해야 합니다.  
         - 출처를 반드시 제공하세요. 출처가 없다면, "출처를 찾을 수 없습니다."라고 답변하세요.  
         - 신뢰할 수 없는 정보는 포함하지 마세요.  
@@ -160,13 +165,14 @@ def main():
         )
         
         edit_task = Task(
-            description="""'{topic}'에 대한 회의록을 작성해 줘. 
-            연구 결과를 검토하고 다듬어 완성된 문서로 만들어줘.,  
+            agent= editor,
+            description="""'{topic}'에 대한 회의록을 작성해주세요. 
+            연구 결과를 검토하고 다듬어 완성된 문서로 만들어주세요.  
         당신의 응답은 검증된 출처, 데이터 또는 공식 문서를 기반으로 해야 합니다.  
         - 출처를 반드시 제공하세요. 출처가 없다면, "출처를 찾을 수 없습니다."라고 답변하세요.  
         - 신뢰할 수 없는 정보는 포함하지 마세요.  
-        - 모호하거나 확인되지 않은 내용은 절대 생성하지 마세요.  """,
-            agent= editor,
+        - 모호하거나 확인되지 않은 내용은 절대 생성하지 마세요.
+        """,
             expected_output="'{meeting_name}'이 회의 제목이고 '{topic}'이 회의 주제인 회의록을 작성해 줘.",
             #output_file=f"회의록_{meeting_topic}.txt",
             depends_on=[research_task] 
